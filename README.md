@@ -218,7 +218,7 @@ Questo progetto è sotto licenza ISC - vedi il file [LICENSE](LICENSE) per i det
 
 ## 👥 Autori
 
-- Il tuo nome - *Lavoro iniziale*
+- Alessandro Mussini - *Lavoro iniziale*
 
 ## 🙏 Ringraziamenti
 
