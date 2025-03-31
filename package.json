@@ -1,0 +1,42 @@
+{
+  "name": "trecentodieci_totem_telegram",
+  "version": "1.0.0",
+  "description": "Applicazione per l'intercomunicazione di TotemAPI con Telegram e OpenAI",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-csp-header": "^6.1.0",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "multer": "^1.4.5-lts.2",
+    "mysql": "^2.18.1",
+    "node-telegram-bot-api": "^0.64.0",
+    "nodemailer": "^6.10.0",
+    "pdf-lib": "^1.17.1",
+    "sha1": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^6.3.4"
+  }
+}
