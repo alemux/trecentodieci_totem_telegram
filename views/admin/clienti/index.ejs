@@ -1,0 +1,169 @@
+<%- layout('layout') -%>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Gestione Clienti</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">Clienti</li>
+    </ol>
+    
+    <!-- Flash Messages -->
+    <% if (locals.successMessage) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+    
+    <% if (locals.errorMessage) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-users me-1"></i>
+                Elenco Clienti
+            </div>
+            <a href="/admin/clienti/nuovo" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i> Nuovo Cliente
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Filtri di ricerca -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cerca per nome...">
+                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <table id="clientiTable" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Logo</th>
+                        <th>Nome</th>
+                        <th>Piattaforma</th>
+                        <th>URL Piattaforma</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (clienti && clienti.length > 0) { %>
+                        <% clienti.forEach(cliente => { %>
+                            <tr>
+                                <td><%= cliente.client_id %></td>
+                                <td>
+                                    <% if (cliente.logo) { %>
+                                        <img src="/uploads/clienti/<%= cliente.logo %>" alt="Logo <%= cliente.nome %>" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                                    <% } else { %>
+                                        <span class="text-muted">Nessun logo</span>
+                                    <% } %>
+                                </td>
+                                <td><%= cliente.nome %></td>
+                                <td><%= cliente.platform %></td>
+                                <td>
+                                    <% if (cliente.platform_url) { %>
+                                        <a href="<%= cliente.platform_url %>" target="_blank"><%= cliente.platform_url %></a>
+                                    <% } else { %>
+                                        <span class="text-muted">Non specificato</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/admin/clienti/dettagli/<%= cliente.id %>" class="btn btn-info btn-sm" title="Dettagli">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/admin/clienti/modifica/<%= cliente.id %>" class="btn btn-primary btn-sm" title="Modifica">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger btn-sm delete-cliente" 
+                                           data-id="<%= cliente.id %>" 
+                                           data-nome="<%= cliente.nome %>" 
+                                           title="Elimina">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="text-center">Nessun cliente trovato</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Conferma Eliminazione -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare il cliente <span id="clienteNome" class="fw-bold"></span>?
+                <p class="text-danger mt-2">Questa azione non può essere annullata.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Elimina</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inizializza DataTables
+        $('#clientiTable').DataTable({
+            language: {
+                url: 'https://cdn.jsdelivr.net/npm/datatables.net-plugins@1.10.25/i18n/Italian.json'
+            },
+            order: [[2, 'asc']], // Ordina per nome (indice 2)
+            pageLength: 10,
+            responsive: true
+        });
+        
+        // Ricerca nella tabella
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const searchTerm = document.getElementById('searchInput').value;
+            $('#clientiTable').DataTable().search(searchTerm).draw();
+        });
+        
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                $('#clientiTable').DataTable().search(this.value).draw();
+            }
+        });
+        
+        // Conferma eliminazione cliente
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        
+        document.querySelectorAll('.delete-cliente').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const nome = this.getAttribute('data-nome');
+                
+                document.getElementById('clienteNome').textContent = nome;
+                document.getElementById('confirmDelete').href = `/admin/clienti/elimina/${id}`;
+                
+                deleteModal.show();
+            });
+        });
+    });
+</script> 

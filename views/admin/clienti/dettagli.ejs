@@ -1,0 +1,226 @@
+<%- layout('layout') -%>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Dettagli Cliente</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/admin/clienti">Clienti</a></li>
+        <li class="breadcrumb-item active">Dettagli Cliente</li>
+    </ol>
+    
+    <!-- Flash Messages -->
+    <% if (locals.successMessage) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+    
+    <div class="row">
+        <!-- Colonna informazioni cliente -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-1"></i>
+                    Informazioni Cliente
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <% if (cliente.logo) { %>
+                            <img src="/uploads/clienti/<%= cliente.logo %>" alt="Logo <%= cliente.nome %>" class="img-fluid mb-3" style="max-height: 150px;">
+                        <% } else { %>
+                            <div class="border rounded p-3 mb-3">
+                                <i class="fas fa-building fa-5x text-secondary"></i>
+                                <p class="text-muted mt-2">Nessun logo</p>
+                            </div>
+                        <% } %>
+                        <h4><%= cliente.nome %></h4>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%;">ID Cliente:</th>
+                                    <td><%= cliente.client_id %></td>
+                                </tr>
+                                <tr>
+                                    <th>Piattaforma:</th>
+                                    <td><%= cliente.platform %></td>
+                                </tr>
+                                <tr>
+                                    <th>URL Piattaforma:</th>
+                                    <td>
+                                        <% if (cliente.platform_url) { %>
+                                            <a href="<%= cliente.platform_url %>" target="_blank"><%= cliente.platform_url %></a>
+                                        <% } else { %>
+                                            <span class="text-muted">Non specificato</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="/admin/clienti" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Indietro
+                        </a>
+                        <div>
+                            <a href="/admin/clienti/elimina/<%= cliente.id %>" class="btn btn-danger me-2 delete-cliente" 
+                               data-id="<%= cliente.id %>" 
+                               data-nome="<%= cliente.nome %>">
+                                <i class="fas fa-trash me-1"></i> Elimina
+                            </a>
+                            <a href="/admin/clienti/modifica/<%= cliente.id %>" class="btn btn-primary">
+                                <i class="fas fa-edit me-1"></i> Modifica
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonna totem collegati -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-tablet me-1"></i>
+                    Totem Collegati
+                </div>
+                <div class="card-body">
+                    <% if (totems && totems.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>IP</th>
+                                        <th>URL Pubblico</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% totems.forEach(totem => { %>
+                                        <tr>
+                                            <td><%= totem.idtotem %></td>
+                                            <td><%= totem.nome %></td>
+                                            <td><%= totem.ip %></td>
+                                            <td>
+                                                <% if (totem.public_project_url) { %>
+                                                    <a href="<%= totem.public_project_url %>" target="_blank"><%= totem.public_project_url %></a>
+                                                <% } else { %>
+                                                    <span class="text-muted">Non specificato</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/totems/dettagli/<%= totem.idtotem %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nessun totem collegato a questo cliente.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Feed RSS Collegati -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-rss me-1"></i>
+                    Feed RSS Collegati
+                </div>
+                <div class="card-body">
+                    <% if (rss && rss.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>URL Feed</th>
+                                        <th>Stato</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% rss.forEach(feed => { %>
+                                        <tr>
+                                            <td><%= feed.id %></td>
+                                            <td>
+                                                <a href="<%= feed.url %>" target="_blank"><%= feed.url %></a>
+                                            </td>
+                                            <td>
+                                                <% if (feed.attivo == 1) { %>
+                                                    <span class="badge bg-success">Attivo</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary">Inattivo</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/rss/dettagli/<%= feed.id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nessun feed RSS collegato a questo cliente.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Conferma Eliminazione -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare il cliente <span id="clienteNome" class="fw-bold"></span>?
+                <p class="text-danger mt-2">Questa azione non può essere annullata.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Elimina</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestione modale di conferma eliminazione
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        
+        document.querySelector('.delete-cliente').addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            const nome = this.getAttribute('data-nome');
+            
+            document.getElementById('clienteNome').textContent = nome;
+            document.getElementById('confirmDelete').href = `/admin/clienti/elimina/${id}`;
+            
+            deleteModal.show();
+        });
+    });
+</script> 

@@ -1,0 +1,73 @@
+<%- layout('layout') %>
+
+<% title = 'Aggiornamenti' %>
+<% activeMenu = 'aggiornamenti' %>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h3 class="card-title">Filtri</h3>
+        <form action="/admin/aggiornamenti" method="get">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Cliente</label>
+                        <select class="form-select" name="cliente_id">
+                            <option value="">Tutti i clienti</option>
+                            <% clienti.forEach(function(cliente) { %>
+                            <option value="<%= cliente.client_id %>" <%= filtroClienteId == cliente.client_id ? 'selected' : '' %>><%= cliente.nome %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Filtra</button>
+                    <a href="/admin/aggiornamenti" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Elenco Aggiornamenti</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Piattaforma</th>
+                    <th>Hash</th>
+                    <th>Data</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% aggiornamenti.forEach(function(aggiornamento) { %>
+                <tr>
+                    <td><span class="text-muted"><%= aggiornamento.id %></span></td>
+                    <td><%= aggiornamento.client_nome %></td>
+                    <td><span class="badge bg-blue"><%= aggiornamento.platform %></span></td>
+                    <td><code><%= aggiornamento.hash %></code></td>
+                    <td><%= aggiornamento.date %></td>
+                    <td>
+                        <div class="btn-list flex-nowrap">
+                            <a href="/admin/aggiornamenti/dettagli/<%= aggiornamento.id %>" class="btn btn-sm btn-info">
+                                Dettagli
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <% }); %>
+
+                <% if(aggiornamenti.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="text-center">Nessun aggiornamento trovato</td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div> 

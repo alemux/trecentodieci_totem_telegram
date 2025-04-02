@@ -47,4 +47,23 @@ const verifyToken = (req, res, next) => {
     next();
 };
 
-module.exports = { verifyToken }; 
+const isAdmin = (req, res, next) => {
+    console.log('Controllo sessione admin:', req.session);
+    if (!req.session) {
+        console.error('Errore: Sessione non disponibile');
+        return res.redirect('/admin/login?error=no_session');
+    }
+    
+    if (req.session.isAdmin) {
+        console.log('Utente autenticato come admin');
+        next();
+    } else {
+        console.log('Accesso non autorizzato: utente non admin');
+        res.redirect('/admin/login?error=unauthorized');
+    }
+};
+
+module.exports = {
+    verifyToken,
+    isAdmin
+}; 
