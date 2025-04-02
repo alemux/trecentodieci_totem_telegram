@@ -6,6 +6,8 @@ const corsOptions = {
         
         // Elenco di domini autorizzati
         const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+        
+        console.log("origin", origin);
         console.log(allowedOrigins);
         console.log(allowedOrigins.indexOf(origin));
         console.log(!origin);
