@@ -5,11 +5,7 @@ const corsOptions = {
         if (!origin) return callback(null, true);
         
         // Elenco di domini autorizzati
-        const allowedOrigins = [
-            'http://localhost',
-            'http://localhost:3000',
-            'https://trecentodieci.com'
-        ];
+        const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
         
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
