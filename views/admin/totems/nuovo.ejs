@@ -1,0 +1,60 @@
+<%- layout('layout') %>
+
+<% title = 'Nuovo Totem' %>
+<% activeMenu = 'totems' %>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Inserisci un nuovo totem</h3>
+    </div>
+    <div class="card-body">
+        <form action="/admin/totems/nuovo" method="post">
+            <div class="form-group mb-3">
+                <label class="form-label required">Nome Totem</label>
+                <input type="text" class="form-control" name="nome" placeholder="Inserisci il nome del totem" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label required">Cliente</label>
+                <select class="form-select" name="client_id" required>
+                    <option value="">Seleziona cliente</option>
+                    <% clienti.forEach(function(cliente) { %>
+                    <option value="<%= cliente.client_id %>"><%= cliente.nome %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label required">Piattaforma</label>
+                <select class="form-select" name="platform" required>
+                    <option value="">Seleziona piattaforma</option>
+                    <option value="wordpress">WordPress</option>
+                    <option value="shopify">Shopify</option>
+                    <option value="prestashop">PrestaShop</option>
+                    <option value="magento">Magento</option>
+                    <option value="woocommerce">WooCommerce</option>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label required">Client ID</label>
+                <input type="text" class="form-control" name="CLIENT_ID" placeholder="Inserisci Client ID" required>
+                <small class="form-hint">Identificativo univoco per il client</small>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label required">Secret Key</label>
+                <input type="text" class="form-control" name="SECRET_KEY" placeholder="Inserisci Secret Key" required>
+                <small class="form-hint">Chiave segreta per l'autenticazione</small>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Indirizzo IP</label>
+                <input type="text" class="form-control" name="ip" placeholder="192.168.x.x">
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">URL Pubblico Progetto</label>
+                <input type="url" class="form-control" name="public_project_url" placeholder="https://example.com">
+            </div>
+            <div class="form-footer">
+                <a href="/admin/totems" class="btn btn-link">Annulla</a>
+                <button type="submit" class="btn btn-primary ms-auto">Salva Totem</button>
+            </div>
+        </form>
+    </div>
+</div> 

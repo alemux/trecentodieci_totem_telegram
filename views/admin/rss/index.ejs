@@ -1,0 +1,95 @@
+<%- layout('layout') %>
+
+<% title = 'Gestione RSS' %>
+<% activeMenu = 'rss' %>
+<% actionButton = {
+    url: '/admin/rss/nuovo',
+    text: 'Nuovo Feed RSS'
+} %>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h3 class="card-title">Filtri</h3>
+        <form action="/admin/rss" method="get">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Cliente</label>
+                        <select class="form-select" name="cliente_id">
+                            <option value="">Tutti i clienti</option>
+                            <% clienti.forEach(function(cliente) { %>
+                            <option value="<%= cliente.client_id %>" <%= filtroClienteId == cliente.client_id ? 'selected' : '' %>><%= cliente.nome %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Filtra</button>
+                    <a href="/admin/rss" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Elenco Feed RSS</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Platform</th>
+                    <th>URL</th>
+                    <th>Stato</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% feeds.forEach(function(feed) { %>
+                <tr>
+                    <td><span class="text-muted"><%= feed.id %></span></td>
+                    <td><%= feed.client_nome %></td>
+                    <td><span class="badge bg-blue"><%= feed.platform %></span></td>
+                    <td><a href="<%= feed.url %>" target="_blank"><%= feed.url %></a></td>
+                    <td>
+                        <% if(feed.attivo) { %>
+                        <span class="badge bg-success">Attivo</span>
+                        <% } else { %>
+                        <span class="badge bg-danger">Disattivato</span>
+                        <% } %>
+                    </td>
+                    <td>
+                        <div class="btn-list flex-nowrap">
+                            <a href="/admin/rss/modifica/<%= feed.id %>" class="btn btn-sm btn-primary">
+                                Modifica
+                            </a>
+                            <% if(feed.attivo) { %>
+                            <a href="/admin/rss/disattiva/<%= feed.id %>" class="btn btn-sm btn-warning">
+                                Disattiva
+                            </a>
+                            <% } else { %>
+                            <a href="/admin/rss/attiva/<%= feed.id %>" class="btn btn-sm btn-success">
+                                Attiva
+                            </a>
+                            <% } %>
+                            <a href="/admin/rss/elimina/<%= feed.id %>" class="btn btn-sm btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questo feed RSS?')">
+                                Elimina
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <% }); %>
+
+                <% if(feeds.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="text-center">Nessun feed RSS trovato</td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div> 

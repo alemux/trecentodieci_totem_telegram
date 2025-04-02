@@ -1,0 +1,211 @@
+<%- layout('layout') -%>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Nuovo Cliente</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/admin/clienti">Clienti</a></li>
+        <li class="breadcrumb-item active">Nuovo Cliente</li>
+    </ol>
+    
+    <!-- Flash Messages -->
+    <% if (locals.errorMessage) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-plus me-1"></i>
+            Inserisci nuovo cliente
+        </div>
+        <div class="card-body">
+            <form action="/admin/clienti/nuovo" method="POST" enctype="multipart/form-data" id="nuovoClienteForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="client_id" class="form-label">Client ID*</label>
+                            <input type="text" class="form-control" id="client_id" name="client_id" required maxlength="50">
+                            <div class="form-text">Identificativo univoco del cliente (max 50 caratteri)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome Cliente*</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required maxlength="100">
+                            <div class="form-text">Nome completo del cliente (max 100 caratteri)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="platform" class="form-label">Piattaforma*</label>
+                            <input type="text" class="form-control" id="platform" name="platform" required maxlength="50">
+                            <div class="form-text">Piattaforma utilizzata dal cliente (es. wordpress, shopify, prestashop)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="platform_url" class="form-label">URL Piattaforma</label>
+                            <input type="url" class="form-control" id="platform_url" name="platform_url" maxlength="50">
+                            <div class="form-text">URL della piattaforma del cliente</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="logo" class="form-label">Logo</label>
+                            <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                            <div class="form-text">Logo del cliente (formati supportati: JPG, PNG, GIF - max 5MB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Anteprima Logo</label>
+                            <div id="logoPreview" class="border rounded p-2 text-center">
+                                <p class="text-muted mb-0">Nessun file selezionato</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="/admin/clienti" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Annulla
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Salva Cliente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validazione del form
+        const form = document.getElementById('nuovoClienteForm');
+        
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            // Validazione client_id
+            const clientId = document.getElementById('client_id').value.trim();
+            if (!clientId) {
+                isValid = false;
+                showError('client_id', 'L\'ID cliente è obbligatorio');
+            } else if (!/^[a-zA-Z0-9_-]+$/.test(clientId)) {
+                isValid = false;
+                showError('client_id', 'L\'ID cliente può contenere solo lettere, numeri, trattini e underscore');
+            }
+            
+            // Validazione nome
+            const nome = document.getElementById('nome').value.trim();
+            if (!nome) {
+                isValid = false;
+                showError('nome', 'Il nome del cliente è obbligatorio');
+            }
+            
+            // Validazione platform
+            const platform = document.getElementById('platform').value.trim();
+            if (!platform) {
+                isValid = false;
+                showError('platform', 'La piattaforma è obbligatoria');
+            }
+            
+            // Validazione logo (dimensione e formato)
+            const logoInput = document.getElementById('logo');
+            if (logoInput.files.length > 0) {
+                const file = logoInput.files[0];
+                
+                // Controllo dimensione (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    isValid = false;
+                    showError('logo', 'Il file è troppo grande. La dimensione massima è 5MB');
+                }
+                
+                // Controllo formato
+                const allowedFormats = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!allowedFormats.includes(file.type)) {
+                    isValid = false;
+                    showError('logo', 'Formato non supportato. Utilizza JPG, PNG o GIF');
+                }
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+        
+        // Funzione per mostrare errori di validazione
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            field.classList.add('is-invalid');
+            
+            // Rimuovi eventuali messaggi di errore esistenti
+            let nextSibling = field.nextElementSibling;
+            if (nextSibling && nextSibling.classList.contains('invalid-feedback')) {
+                nextSibling.remove();
+            }
+            
+            // Aggiungi nuovo messaggio di errore
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = message;
+            field.parentNode.insertBefore(errorDiv, field.nextSibling);
+        }
+        
+        // Rimozione errori quando l'utente interagisce con il campo
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                let nextSibling = this.nextElementSibling;
+                if (nextSibling && nextSibling.classList.contains('invalid-feedback')) {
+                    nextSibling.remove();
+                }
+            });
+        });
+        
+        // Anteprima del logo
+        document.getElementById('logo').addEventListener('change', function(e) {
+            const logoPreview = document.getElementById('logoPreview');
+            
+            // Rimuovi contenuto precedente
+            logoPreview.innerHTML = '';
+            
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                
+                // Verifico che sia un'immagine
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-fluid';
+                        img.style.maxHeight = '150px';
+                        logoPreview.appendChild(img);
+                    }
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    logoPreview.innerHTML = '<p class="text-danger">File non valido. Seleziona un\'immagine.</p>';
+                }
+            } else {
+                logoPreview.innerHTML = '<p class="text-muted mb-0">Nessun file selezionato</p>';
+            }
+        });
+    });
+</script> 

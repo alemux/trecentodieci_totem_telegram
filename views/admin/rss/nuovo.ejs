@@ -1,0 +1,50 @@
+<%- layout('layout') %>
+
+<% title = 'Nuovo Feed RSS' %>
+<% activeMenu = 'rss' %>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Inserisci un nuovo feed RSS</h3>
+    </div>
+    <div class="card-body">
+        <form action="/admin/rss/nuovo" method="post">
+            <div class="form-group mb-3">
+                <label class="form-label required">Cliente</label>
+                <select class="form-select" name="client_id" required id="cliente_select">
+                    <option value="">Seleziona cliente</option>
+                    <% clienti.forEach(function(cliente) { %>
+                    <option value="<%= cliente.client_id %>" data-platform="<%= cliente.platform %>"><%= cliente.nome %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label required">URL Feed</label>
+                <input type="url" class="form-control" name="url" placeholder="https://example.com/feed" required>
+                <small class="form-hint">Inserisci l'URL completo del feed RSS</small>
+            </div>
+            <div class="form-group mb-3 form-check form-switch">
+                <label class="form-check-label">Feed attivo</label>
+                <input class="form-check-input" type="checkbox" name="attivo" value="1" checked>
+            </div>
+            <input type="hidden" name="platform" id="platform_hidden">
+            <div class="form-footer">
+                <a href="/admin/rss" class="btn btn-link">Annulla</a>
+                <button type="submit" class="btn btn-primary ms-auto">Salva Feed</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const clienteSelect = document.getElementById('cliente_select');
+        const platformHidden = document.getElementById('platform_hidden');
+        
+        // Aggiorna il valore della piattaforma quando cambia il cliente selezionato
+        clienteSelect.addEventListener('change', function() {
+            const selectedOption = clienteSelect.options[clienteSelect.selectedIndex];
+            platformHidden.value = selectedOption.getAttribute('data-platform') || '';
+        });
+    });
+</script> 
